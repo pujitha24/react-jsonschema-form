@@ -264,14 +264,18 @@ export default function sanitizeDataForNewSchema<
                   aValue,
                   experimental_customMergeAllOf,
                 );
-            const itemValue = sanitizeDataForNewSchema<T, S, F>(
-              validator,
-              rootSchema,
-              newItemSchema,
-              oldItemSchema,
-              aValue,
-              experimental_customMergeAllOf,
-            );
+            let itemValue: unknown = aValue;
+            // An object item schema without `properties` has nothing to prune, so keep the element as it is
+            if (newItemSchema[PROPERTIES_KEY]) {
+              itemValue = sanitizeDataForNewSchema<T, S, F>(
+                validator,
+                rootSchema,
+                newItemSchema,
+                oldItemSchema,
+                aValue,
+                experimental_customMergeAllOf,
+              );
+            }
             if (itemValue !== undefined && (maxItems < 0 || newValue.length < maxItems)) {
               newValue.push(itemValue);
             }
